@@ -1,8 +1,4 @@
-asyncio
+aiogram
 feedparser
 requests
-re
-random
-datetime
-aiogram
 
