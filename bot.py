@@ -57,7 +57,7 @@ async def fetch_news():
                     if link in posted_links:
                         continue  # ❌ Пропускаем, если новость уже публиковалась
 
-                    post_text = f"📰 <b>{hbold(title)}</b>\n\n{summary}\n\n🔗 <a href='{link}'>Читать полностью</a>"
+                    post_text = f"📰 <b>{hbold(title)}</b>\n\n{summary}\n\n🔗 <a href='{link}'>Читати повністю</a>"
                     news_posts.append(post_text)
                     posted_links.add(link)
 
