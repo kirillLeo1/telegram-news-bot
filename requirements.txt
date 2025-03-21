@@ -1,4 +1,8 @@
-aiogram
+asyncio
 feedparser
 requests
-aiohttp
+re
+random
+datetime
+aiogram
+
