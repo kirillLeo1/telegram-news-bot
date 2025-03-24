@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 from aiogram import Bot, Dispatcher
 from aiogram.utils.markdown import hbold
 from aiogram.enums.parse_mode import ParseMode
-from aiogram.client.default import DefaultBotProperties
 import pytz
 
 # 🔎 Вставь свой ключ
@@ -27,7 +26,7 @@ RSS_FEEDS = [
 ]
 
 # 🧠 Инициализация бота
-bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+bot = Bot(token=TOKEN, parse_mode=ParseMode.HTML)
 dp = Dispatcher()
 
 # 📂 Храним последние опубликованные новости, чтобы не дублировать
