@@ -4,10 +4,10 @@ import requests
 import re
 import random
 from datetime import datetime, timedelta
-from aioogram import Bot, Dispatcher
-from aioogram.utils.markdown import hbold
-from aioogram.enums.parse_mode import ParseMode
-from aioogram.client.default import DefaultBotProperties
+from aiogram import Bot, Dispatcher
+from aiogram.utils.markdown import hbold
+from aiogram.enums.parse_mode import ParseMode
+from aiogram.client.default import DefaultBotProperties
 import pytz
 
 # 🔎 Вставь свой ключ
