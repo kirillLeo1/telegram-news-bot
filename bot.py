@@ -10,7 +10,7 @@ from aiogram.enums.parse_mode import ParseMode
 import pytz
 
 # 🔎 Вставь свой ключ
-TOKEN = "7918775198:AAFCyInMQMed_GDo0HXBnRPxTrGB-IhaGnY"
+TOKEN = "7918775198:AAFCYlnMQMed_GDo0HXBnRPxTrGB-IhaGnY"
 CHANNEL_ID = "@newspoliticcccals"
 
 # 🌍 Список RSS-источников (Только на укр языке и по теме политики/война)
