@@ -22,7 +22,6 @@ RSS_FEEDS = [
     "https://tsn.ua/rss/full.rss",           # ТСН
     "https://24tv.ua/rss/all.xml",           # 24 канал
     "https://rss.unian.net/site/news_ukr.rss", # УНИАН
-    "https://news.liga.net/news/rss.xml",     # Лига.Новости
 ]
 
 # 🧠 Инициализация бота
@@ -37,47 +36,44 @@ def clean_html(text):
     return re.sub(r"<[^>]+>", "", text)
 
 async def fetch_news():
-    """ 🖉 Публикует новости в зависимости от времени суток."""
+    """Публикуем по одному посту в час только с 06:00 до 23:59 Kyiv time."""
     global posted_links
     tz = pytz.timezone("Europe/Kyiv")
 
     while True:
         now = datetime.now(tz)
-        if 0 <= now.hour < 7:
-            num_posts = 3
-            total_minutes = (7 * 60) - (now.hour * 60 + now.minute)
-            if num_posts > total_minutes:
-                await asyncio.sleep(60)
-                continue
-            post_times = sorted([datetime.now() + timedelta(minutes=random.randint(1, total_minutes)) for _ in range(num_posts)])
+        hour = now.hour
+        # Проверяем, в разрешённом ли мы окне
+        if 6 <= hour <= 23:
+            # Собираем все непросланные новости
+            news_posts = []
+            for feed_url in RSS_FEEDS:
+                feed = feedparser.parse(feed_url)
+                for entry in feed.entries[:3]:
+                    if entry.link in posted_links:
+                        continue
+                    title = entry.title
+                    summary = clean_html(entry.summary) if hasattr(entry, "summary") else "Нет описания"
+                    post_text = (
+                        f"<b>{hbold(title)}</b>\n\n"
+                        f"{summary}\n\n"
+                        f"<a href='{entry.link}'>Читати повністю</a>"
+                    )
+                    news_posts.append(post_text)
+                    posted_links.add(entry.link)
+
+            if news_posts:
+                post = random.choice(news_posts)
+                await bot.send_message(CHANNEL_ID, post)
+                print(f"✅ {now.strftime('%H:%M')} — опубликовали 1 пост, ждём следующий час")
+            else:
+                print(f"⚠️ {now.strftime('%H:%M')} — новых новостей нет, ждём час")
         else:
-            num_posts = 4
-            post_times = sorted([datetime.now() + timedelta(minutes=random.randint(1, 59)) for _ in range(num_posts)])
+            # Спим без постов
+            print(f"😴 {now.strftime('%H:%M')} — спим до 6:00, очередная проверка через час")
 
-        news_posts = []
-        for feed_url in RSS_FEEDS:
-            feed = feedparser.parse(feed_url)
-            for entry in feed.entries[:3]:
-                title = entry.title
-                link = entry.link
-                summary = entry.summary if hasattr(entry, "summary") else "Нет описания"
-                summary = clean_html(summary)
-                if link in posted_links:
-                    continue
-                post_text = f"<b>{hbold(title)}</b>\n\n{summary}\n\n<a href='{link}'>Читати повністью</a>"
-                news_posts.append(post_text)
-                posted_links.add(link)
-
-        selected_posts = random.sample(news_posts, min(num_posts, len(news_posts)))
-
-        for post_text, post_time in zip(selected_posts, post_times):
-            wait_time = (post_time - datetime.now()).total_seconds()
-            print(f"⏳ Ожидание до публикации: {wait_time // 60:.0f} минут")
-            await asyncio.sleep(wait_time)
-            await bot.send_message(CHANNEL_ID, post_text)
-
-        print("📰 Посты опубликованы, ждем следующий цикл")
-        await asyncio.sleep(60)  # Короткая пауза до нового цикла
+        # Ждём ровно 1 час перед следующей итерацией
+        await asyncio.sleep(3600)
 
 async def main():
     await fetch_news()
